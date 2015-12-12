@@ -11,8 +11,8 @@ This project is an extension of *SLAM for Navigation of MAV's in Unknown Indoor 
 [Getting Mavros and Mavlink](#Getting Mavros and Mavlink)  
 [Main Scripts](#Main Scripts) 
 [Setting up OpeNNI and OpenCV](#Setting up OpeNNI and OpenCV)
+[Offboard Control](#Offboard Control)
 [Setting up visual odometry and sensor fusion](Setting up visual odometry and sensor fusion)
-[Offboard Control with the Pixhawk](#Offboard Control with the Pixhawk)
 [PandaBoard Issues](#PandaBoard Issues)
 [Further Improvements](#Further Improvements)  
 [Conclusions](#Conclusions)  
@@ -126,6 +126,12 @@ find out whether it is connected to it (every 1 second). This is to make sure th
 
 Mavros is a MAVLink extendable communication node for ROS with proxy for Ground Control Station. It's Mavlink ported to ROS.It allows you to send commands to the quadcopter via ROS communication protocols. This is the basis of autonomous and teleop flight.
 
+<a name="Offboard Control"></a>
+###Offboard Control
+![https://cloud.githubusercontent.com/assets/4311090/11760392/895c72bc-a05e-11e5-9e2c-baacbeae79d3.png]
+
+
+
 
 <a name="PandaBoard Issues"></a> 
 ###PandaBoard Issues
@@ -153,7 +159,7 @@ sudo minicom -D /dev/tty/USB0
 
 + Work on the project is still ongoing. The biggest impediment to testing out the code is the connection from the pixhawk to the pandaboard. The FTDI to USB cord from the pixhawk shows up as /tty/dev/ACM0 on the Pandaboard. Changing it to /tty/dev/USB0 in the px4.launch file allows the launch file to run. However a Heartbeat isn't gotten from the pixhawk, neither is any other message. 
   Using a USB to USB connection from the Pandaboard to the Pixhawk works, all the messages from the pixhawk are received by the board. This isn't a solution as USB-USB connections on the pixhawk time-out after 30 seconds of not receiving any signal. This is highly undesirable during flight. I haven't been able to resolve this issue yet, I'm confident I will during the coming weeks
-+ Using a more powerful or better supported board to bypass the aforementioned issues and to implement real time SLAM and sensor fusion on the board.
++ Using a more powerful or better supported board to bypass the aforementioned issues and to implement real time SLAM and sensor fusion on the board. Everyboard referenced in the ROS and Pixhawk wikis is at the least quad core boards.The PandaBoard is a Dual-Core board
 
 <a name="Conclusions"></a>
 ###Conclusions 
