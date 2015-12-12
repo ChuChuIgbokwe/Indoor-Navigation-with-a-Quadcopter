@@ -4,9 +4,9 @@ This project is an extension of *SLAM for Navigation of MAV's in Unknown Indoor 
 
 ###Table of Contents
 [Objective](#Objective)  
+[Project Overview](#Project Overview) 
 [Setting up an internet connection  on the Pandaboard](#Setting up an internet connection  on the Pandaboard)  
 [Setting up ROS](#Setting up ROS)  
-[Project Overview](#Project Overview)  
 [Building the pixhawk](#Building the pixhawk)  
 [Getting Mavros and Mavlink](#Getting Mavros and Mavlink)  
 [Main Scripts](#Main Scripts) 
@@ -16,6 +16,7 @@ This project is an extension of *SLAM for Navigation of MAV's in Unknown Indoor 
 [PandaBoard Issues](#PandaBoard Issues)
 [Further Improvements](#Further Improvements)  
 [Conclusions](#Conclusions)  
+[References](#References)
 
 <a name="Objective"></a> 
 ###Objective
@@ -103,7 +104,27 @@ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc # auto sources workspace
 source ~/.bashrc
 ```
 
+<a name="Getting Mavros and Mavlink"></a> 
+###Getting Mavros and Mavlink
+MAVLink is a very lightweight, header-only message marshalling library for micro air vehicles according to the official documentation. It is a communication protocol used for communication between an autonomous vehicle - it's auto pilot or flight controller exactly- and fellow autonomous vehicles, it's ground station or its onboard computer. 
+Basically mavlink is a stream of bytes sent via telemetry or USB from the auto pilot to the ground control station.
+The two most popular firmwares that use mavlink are the APM and PX4. In this project the Pixhawk which has a PX4 build was used.
+Each MavLink packet has a length of 17 bytes 
++ 6 bytes header
++ message header, always 0xFE
++ message length (9)
++ sequence number -- rolls around from 255 to 0 (0x4e, previous was 0x4d)
++ System ID - what system is sending this message (1)
++ Component ID- what component of the system is sending the message (1)
++ Message ID 
+Variable Sized Payload (specified in octet 1, range 0..255)
+** Payload (the actual data we are interested in)
+Checksum: For error detection.
 
+The most important message is MAVLINK_MSG_ID_HEARTBEAT. The GCS keeps sending a message to APM/PX4 to
+find out whether it is connected to it (every 1 second). This is to make sure the MP is in sync with APM when you update some parameters. If a number of heartbeats are missed, a failsafe (can be) is triggered and copter lands, continues the mission or Returns to launch (also called, RTL).
+
+Mavros is a MAVLink extendable communication node for ROS with proxy for Ground Control Station. It's Mavlink ported to ROS.It allows you to send commands to the quadcopter via ROS communication protocols. This is the basis of autonomous and teleop flight.
 
 
 <a name="PandaBoard Issues"></a> 
@@ -136,3 +157,8 @@ sudo minicom -D /dev/tty/USB0
 
 <a name="Conclusions"></a>
 ###Conclusions 
+
+
+<a name="References"></a>
+###References
+1. MavLink Tutorial for Absolute Dummies 
