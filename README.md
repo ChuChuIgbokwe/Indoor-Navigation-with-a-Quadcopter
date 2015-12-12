@@ -3,28 +3,33 @@ SLAM for Navigation of MAV's in Unknown Indoor Environments
 This project is an extension of *SLAM for Navigation of MAV's in Unknown Indoor Environments* by Gian Danuser and Michael Eugester. 
 
 ###Table of Contents
-[Objective](#Objective)  
+[Objectives](#Objectives)  
 [Project Overview](#Project Overview) 
 [Setting up an internet connection  on the Pandaboard](#Setting up an internet connection  on the Pandaboard)  
 [Setting up ROS](#Setting up ROS)  
 [Building the pixhawk](#Building the pixhawk)  
 [Getting Mavros and Mavlink](#Getting Mavros and Mavlink)  
-[Main Scripts](#Main Scripts) 
 [Setting up OpeNNI and OpenCV](#Setting up OpeNNI and OpenCV)
-[Offboard Control](#Offboard Control)
 [Setting up visual odometry and sensor fusion](Setting up visual odometry and sensor fusion)
-[PandaBoard Issues](#PandaBoard Issues)
+[Offboard Control](#Offboard Control)
+[What's been Done and Issues](#What's been Done and Issues)
 [Further Improvements](#Further Improvements)  
 [Conclusions](#Conclusions)  
 [References](#References)
 
-<a name="Objective"></a> 
-###Objective
+<a name="Objectives"></a> 
+###Objectives
 1. Install ROS on the PandaBoard
 2. Establish communication with the Pixhawk
 3. Fuse IMU data with pose estimates provided by the sensor fusion
 4. Integrate low-level planning and the object avoidance unit
 5. Implement the high-level navigation unit with a goal based trajectory
+
+<a name="Project Overview"></a> 
+###Project Overview
+The long term  goals of this project is to implement real-time SLAM, autonomous flight,obstacle avoidance and object detection on a quadcopter equipped with a PandaBoard and an ASUS XTION PRO. 
+The project builds off previous work that got SLAM working on a laptop, and radio controlled flight of the quadcopter. Fusing these two parts is the major objective of this project.
+The SLAM code used in this project was written from the ground up, including drivers for the ASUS Xtion PRO. The code works, however it is not optimised for the PandaBoard. The solution to this was to use ROS (Robot Operating System) as it has pre-existing packages for SLAM and algorithms can easily be written for autonomy, obstacle avoidance and object Detection.
 
 <a name="Setting up an internet connection  on the Pandaboard"></a> 
 ###Setting up an internet connection  on the Pandaboard
@@ -126,15 +131,26 @@ find out whether it is connected to it (every 1 second). This is to make sure th
 
 Mavros is a MAVLink extendable communication node for ROS with proxy for Ground Control Station. It's Mavlink ported to ROS.It allows you to send commands to the quadcopter via ROS communication protocols. This is the basis of autonomous and teleop flight.
 
+<a name="Setting up visual odometry and sensor fusion"></a>
+###Setting up visual odometry and sensor fusion
+The semi-direct approach eliminates the need of costly feature extraction and robust matching techniques for motion estimation. Our algorithm operates directly on pixel intensities, which results in subpixel precision at high frame-rates. A probabilistic mapping method that explicitly models outlier measurements is used to estimate 3D points, which results in fewer outliers and more reliable points. Precise and high frame-rate motion estimation brings increased robustness in scenes of little, repetitive, and high-frequency texture. The algorithm is applied to micro-aerial-vehicle state-estimation in GPS-denied environments and runs at 55 frames per second on the onboard embedded computer and at more than 300 frames per second on a consumer laptop. 
+
+
 <a name="Offboard Control"></a>
 ###Offboard Control
-![https://cloud.githubusercontent.com/assets/4311090/11760392/895c72bc-a05e-11e5-9e2c-baacbeae79d3.png]
+![Offboard flowchart](https://cloud.githubusercontent.com/assets/4311090/11760392/895c72bc-a05e-11e5-9e2c-baacbeae79d3.png)
+Offboard control is controlling a PX4 based MAV using off-board control software. Ths setup requires a Onboard computer + ROS + WiFi link. This setup will ultimately give the most flexibility. Using ROS simplifies offboard control  as well as providing access to a wide range of motion planning libraries and algorithms currently available in ROS. The WiFi link to the ground computer will also provide a high-bandwidth connection for high stream rates of commands
+The onboard computer is connected to the pixhawk via UART. This project used a UART to USB cable with a DF13 connector plugged into TELEM2 of the Pixhawk
+![FTDI to USB cable in TELEM2 of pixhawk](https://cloud.githubusercontent.com/assets/4311090/11760441/58d2ce68-a061-11e5-9c74-615b0440b057.jpg)
 
-
-
-
-<a name="PandaBoard Issues"></a> 
-###PandaBoard Issues
+<a name="What's been Done and Issues"></a> 
+###What's been Done and Issues
++ ROS Jade was successfully installed. ROS Indigo would be preferred as it is more stable. I tried both and settled on ROS Jade as it was the distro I was able to install the SVO package on.
++ Communication between the Pixhawk and the Onboard computer
++ Openni2 drivers work for the ASUS Xtion Pro
++ I haven't attempted onboard control or arming the motors for reasons stated below
++ I wasn't able to compile The MSF on any ROS distro for the PandaBoard
++ The SVO package works
 + The PandaBoard overheats while compiling your ROS workspace. The board has two cores which means compiling any workspace defaults to using the -j2 flag. To successfully compile any package you have to specify that it runs with one flag like this
 ```
 catkin_make -j1
@@ -153,6 +169,10 @@ sudo minicom -D /dev/tty/USB0
   Minicom is a command line interface for UART to USB communication.The Pandaboard shuts down intermitently. Initially I     suspected this was due to the Xubuntu Desktop Environment I installed on the board. However I also realised that the       board shuts down randomly regardless of what platform you're using. Also since it's a dual core board compiling big        packages that take a long time to compile like PCL cannot be done overnight as the board will reset sometime during the    compilation.
 
 + The Pandaboard is lacking in online support. A lot of questions are unanswered and when they are they are years old or they are current answers for more popular development boards.
++ Do not try to install qgrouncontrol from source. It has too many dependency problems. Simply use
+```
+sudo apt-get install qgroundcontrol
+```
 
 <a name="Further Improvements"></a>
 ###Further Improvements
@@ -160,6 +180,7 @@ sudo minicom -D /dev/tty/USB0
 + Work on the project is still ongoing. The biggest impediment to testing out the code is the connection from the pixhawk to the pandaboard. The FTDI to USB cord from the pixhawk shows up as /tty/dev/ACM0 on the Pandaboard. Changing it to /tty/dev/USB0 in the px4.launch file allows the launch file to run. However a Heartbeat isn't gotten from the pixhawk, neither is any other message. 
   Using a USB to USB connection from the Pandaboard to the Pixhawk works, all the messages from the pixhawk are received by the board. This isn't a solution as USB-USB connections on the pixhawk time-out after 30 seconds of not receiving any signal. This is highly undesirable during flight. I haven't been able to resolve this issue yet, I'm confident I will during the coming weeks
 + Using a more powerful or better supported board to bypass the aforementioned issues and to implement real time SLAM and sensor fusion on the board. Everyboard referenced in the ROS and Pixhawk wikis is at the least quad core boards.The PandaBoard is a Dual-Core board
++ Use the SVO package for visual odometry. It's works using usb cameras. Using the ASUS Xtion Pro will require topic remapping and writing nodelets for the ASUS.
 
 <a name="Conclusions"></a>
 ###Conclusions 
@@ -168,3 +189,6 @@ sudo minicom -D /dev/tty/USB0
 <a name="References"></a>
 ###References
 1. MavLink Tutorial for Absolute Dummies 
+2. **SVO: Fast Semi-Direct Monocular Visual Odometry**  Christian Forster, Matia Pizzoli, Davide Scaramuzza
+3. www.pixhawk.org
+4. 
