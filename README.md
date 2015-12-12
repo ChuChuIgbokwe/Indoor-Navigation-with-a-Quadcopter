@@ -142,13 +142,47 @@ The semi-direct approach eliminates the need of costly feature extraction and ro
 Offboard control is controlling a PX4 based MAV using off-board control software. Ths setup requires a Onboard computer + ROS + WiFi link. This setup will ultimately give the most flexibility. Using ROS simplifies offboard control  as well as providing access to a wide range of motion planning libraries and algorithms currently available in ROS. The WiFi link to the ground computer will also provide a high-bandwidth connection for high stream rates of commands
 The onboard computer is connected to the pixhawk via UART. This project used a UART to USB cable with a DF13 connector plugged into TELEM2 of the Pixhawk
 ![FTDI to USB cable in TELEM2 of pixhawk](https://cloud.githubusercontent.com/assets/4311090/11760441/58d2ce68-a061-11e5-9c74-615b0440b057.jpg)
+Connect the pixhawk to your the Pandaboard and run
+```
+roslaunch mavros px4.launch
+```
+If everything has been setup right you should see
+```
+[ INFO] [1423604938.457425540]: CON: Got HEARTBEAT, connected.
+```
+After that you need to create a px4_blacklist.yaml
+```
+cd /opt/ros/jade/share/mavros
+touch px4_blacklist.yaml
+````
+copy 
+```
+plugin_blacklist:
+- '3dr_radio'
+- 'setpoint_position'
+- 'setpoint_attitude'
+#- 'setpoint_accel'
+- 'setpoint_velocity'
+- 'actuator_control'
+```
+into it.
+Open another tab and run
+```
+rosrun mavros mavsys mode -c OFFBOARD
+```
+To enable offboard control on FMU (offboard from FMU perspective) one needs to send following commands:
++ Use set_mode service, from Mavros plugin sys_status, to set mode to “OFFBOARD”.
++ start streaming offobard setpoints.
++ send MAV_CMD_NAV_GUIDED_ENABLE Mavros command until request is approved.
+After this you should open another tab and rosrun or roslaunch your script.
+
 
 <a name="What's been Done and Issues"></a> 
 ###What's been Done and Issues
 + ROS Jade was successfully installed. ROS Indigo would be preferred as it is more stable. I tried both and settled on ROS Jade as it was the distro I was able to install the SVO package on.
-+ Communication between the Pixhawk and the Onboard computer
++ Communication between the Pixhawk and the onboard computer has been achieved
 + Openni2 drivers work for the ASUS Xtion Pro
-+ I haven't attempted onboard control or arming the motors for reasons stated below
++ I haven't attempted onboard control or arming the motors for reasons stated below.
 + I wasn't able to compile The MSF on any ROS distro for the PandaBoard
 + The SVO package works
 + The PandaBoard overheats while compiling your ROS workspace. The board has two cores which means compiling any workspace defaults to using the -j2 flag. To successfully compile any package you have to specify that it runs with one flag like this
@@ -191,4 +225,6 @@ sudo apt-get install qgroundcontrol
 1. MavLink Tutorial for Absolute Dummies 
 2. **SVO: Fast Semi-Direct Monocular Visual Odometry**  Christian Forster, Matia Pizzoli, Davide Scaramuzza
 3. www.pixhawk.org
-4. 
+4. www.http://qgroundcontrol.org
+5. www.diydrones.com
+6. 
