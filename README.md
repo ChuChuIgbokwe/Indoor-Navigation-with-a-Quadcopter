@@ -11,7 +11,7 @@ This project is an extension of *SLAM for Navigation of MAV's in Unknown Indoor 
 + [Getting Mavros and Mavlink](#Getting Mavros and Mavlink)  
 + [Setting up visual odometry and sensor fusion](#Setting up visual odometry and sensor fusion)
 + [Offboard Control](#Offboard Control)
-+ [What's been Done and Issues](#What's been Done and Issues)
++ [What's been Done,Issues and Tips](#What's been Done,Issues and Tips)
 + [Further Improvements](#Further Improvements)  
 + [Conclusions](#Conclusions)  
 + [References](#References)
@@ -48,16 +48,17 @@ or
 ```
 sudo iwlist wlan0 scan
 ```
+```
 sudo apt-get install wpa-supplicant
 sudo spt-get install isc-dhcp-client
 sudo apt-get interfavahi-autoipd
 sudo apt-get install avahi-autoipd
 
-sudo iwlist wlan0 essid []
-sudo iwlist eth0 essid []
+sudo iwlist wlan0 essid [connection you want to connect to]
+sudo iwlist eth0 essid [connection you want to connect to]
 sudo apt-get install dhclient
 apt-cache search dhclient
-
+```
 once found configure your /etc/network/interfaces
 ```
 sudo nano /etc/network/interfaces
@@ -235,7 +236,7 @@ To enable offboard control on FMU (offboard from FMU perspective) one needs to s
 After this you should open another tab and rosrun or roslaunch your script.
 
 
-<a name="What's been Done and Issues"></a> 
+<a name="What's been Done,Issues and Tips"></a> 
 ###What's been Done and Issues
 + ROS Jade was successfully installed. ROS Indigo would be preferred as it is more stable. I tried both and settled on ROS Jade as it was the distro I was able to install the SVO package on.
 + Communication between the Pixhawk and the onboard computer has been achieved
@@ -243,6 +244,10 @@ After this you should open another tab and rosrun or roslaunch your script.
 + I haven't attempted onboard control or arming the motors for reasons stated below.
 + I wasn't able to compile The MSF on any ROS distro for the PandaBoard
 + The SVO package works
++ + gcc and cmake are tricky. I had to reinstall them multiple times.
++ I had to uninstall Gian and Michaels OpenCV as it prevented packages from compiling.
++ The full set of commands for connecting to the internet can be found on the PandaBoard's home directory in the file pandaboard_history.txt
++ Setting up the Pandaboard to connect to the internet via Northwestern's IP is tricky. An easir solution is to use an ethernet cord to share the internet connection from your laptop.
 + The PandaBoard overheats while compiling your ROS workspace. The board has two cores which means compiling any workspace defaults to using the -j2 flag. To successfully compile any package you have to specify that it runs with one flag like this
 ```
 catkin_make -j1
@@ -266,6 +271,7 @@ sudo minicom -D /dev/tty/USB0
 sudo apt-get install qgroundcontrol
 ```
 
+
 <a name="Further Improvements"></a>
 ###Further Improvements
 
@@ -276,13 +282,14 @@ sudo apt-get install qgroundcontrol
 
 <a name="Conclusions"></a>
 ###Conclusions 
+Achieving the goals of this project within the next couple of weeks is totally feasible.The Pandaboard has been a blessing and a curse. The blessing being that I've gained a very good understanding of Linux ARM systems along with the debugging skills, tips and tricks. My frustration is I do no have much to show for all I've learnt however with the right hardware I can get this project up and runnig quickly.
 
 
 <a name="References"></a>
 ###References
 1. MavLink Tutorial for Absolute Dummies 
-2. **SVO: Fast Semi-Direct Monocular Visual Odometry**  Christian Forster, Matia Pizzoli, Davide Scaramuzza
+2. *SVO: Fast Semi-Direct Monocular Visual Odometry*  Christian Forster, Matia Pizzoli, Davide Scaramuzza
 3. www.pixhawk.org
 4. www.http://qgroundcontrol.org
 5. www.diydrones.com
-6. 
+
