@@ -9,8 +9,7 @@ This project is an extension of *SLAM for Navigation of MAV's in Unknown Indoor 
 [Setting up ROS](#Setting up ROS)  
 [Building the pixhawk](#Building the pixhawk)  
 [Getting Mavros and Mavlink](#Getting Mavros and Mavlink)  
-[Setting up OpeNNI and OpenCV](#Setting up OpeNNI and OpenCV)
-[Setting up visual odometry and sensor fusion](Setting up visual odometry and sensor fusion)
+[Setting up visual odometry and sensor fusion](#Setting up visual odometry and sensor fusion)
 [Offboard Control](#Offboard Control)
 [What's been Done and Issues](#What's been Done and Issues)
 [Further Improvements](#Further Improvements)  
@@ -133,8 +132,63 @@ Mavros is a MAVLink extendable communication node for ROS with proxy for Ground 
 
 <a name="Setting up visual odometry and sensor fusion"></a>
 ###Setting up visual odometry and sensor fusion
-The semi-direct approach eliminates the need of costly feature extraction and robust matching techniques for motion estimation. Our algorithm operates directly on pixel intensities, which results in subpixel precision at high frame-rates. A probabilistic mapping method that explicitly models outlier measurements is used to estimate 3D points, which results in fewer outliers and more reliable points. Precise and high frame-rate motion estimation brings increased robustness in scenes of little, repetitive, and high-frequency texture. The algorithm is applied to micro-aerial-vehicle state-estimation in GPS-denied environments and runs at 55 frames per second on the onboard embedded computer and at more than 300 frames per second on a consumer laptop. 
+Vision pose estimation is implemented in ROS using two packages
++ Semi-Direct Visual Odometry (SVO)
++ Multiple Sensor Fusion Framework (MSF)
 
+The semi-direct approach eliminates the need of costly feature extraction and robust matching techniques for motion estimation. The algorithm operates directly on pixel intensities, which results in subpixel precision at high frame-rates. A probabilistic mapping method that explicitly models outlier measurements is used to estimate 3D points, which results in fewer outliers and more reliable points. Precise and high frame-rate motion estimation brings increased robustness in scenes of little, repetitive, and high-frequency texture. The algorithm is applied to micro-aerial-vehicle state-estimation in GPS-denied environments and runs at 55 frames per second on the onboard embedded computer and at more than 300 frames per second on a consumer laptop. 
+
+The MSF is based on an Extended Kalman Filter (EKF) for 6DOF pose estimation including intrinsic and extrinsic sensor calibration. It combines pose estimates from the Pixhawk via Mavros with the with the pose the SVO package gets from the camera to produce accurate pose estimates of the quadcopter. This allows the quadcopter to be used for applications such as position hold indoors or waypoint navigation based on vision.
+![rqt_graph](https://cloud.githubusercontent.com/assets/4311090/11760816/0374e956-a070-11e5-9276-4d7b3892a822.png)
+
+The SVO package requires two workspaces, one for the plain CMake projects Sophus and Fast and another workspace for the ROS-Catkin projects rpg_vikit and rpg_svo.
+```
+sudo apt-get install libeigen3-dev libeigen3-doc
+mkdir ~/workspace #for the cmake projects
+cd ~/workspace
+git clone https://github.com/strasdat/Sophus.git
+cd Sophus
+git checkout a621ff
+mkdir build
+cd build
+cmake ..
+make
+ 
+cd ~/workspace
+git clone https://github.com/uzh-rpg/fast.git
+cd fast
+mkdir build
+cd build
+cmake ..
+make
+```
+The following steps show how to get the remaining packages installed anb build the catkin workspace
+```
+cd ~/catkin_ws/src
+git clone https://github.com/uzh-rpg/rpg_vikit.git
+git clone https://github.com/uzh-rpg/rpg_svo.git
+git clone https://github.com/ethz-asl/asctec_mav_framework
+git clone https://github.com/ethz-asl/catkin_simple
+git clone https://github.com/ethz-asl/gflags_catkin.git
+git clone https://github.com/ethz-asl/glog_catkin
+https://github.com/ethz-asl/geodetic_utils.git
+git clone https://github.com/ethz-asl/ethzasl_msf
+```
+go to line 200 in ethzasl_msf/msf_core/include/msf_core/msf_sensormanagerROS.h and change
+```
+if (pubPoseCrtl_.getNumSubscribers() || pubPose_.getNumSubscribers() || pubOdometry_.getNumSubscribers()) {
+```
+to 
+```
+if (true){
+```
+remove subscriber detection by the MSF Package.
+check dependencies and compile
+```
+cd ~/catkin_ws
+rosdep install --from-paths src --ignore-src --rosdistro indigo -y
+catkin_make -j2
+```
 
 <a name="Offboard Control"></a>
 ###Offboard Control
@@ -190,7 +244,7 @@ After this you should open another tab and rosrun or roslaunch your script.
 catkin_make -j1
 ```
 ![j1 compilation success](https://cloud.githubusercontent.com/assets/4311090/11759525/3d1d12fc-a041-11e5-9fa1-e79913ad2098.png)
-Or else this happens
+Or else this happens, Overheating!
 ![-j2 compilation error](https://cloud.githubusercontent.com/assets/4311090/11759503/670c1a32-a040-11e5-8b32-0d605d9cb48c.png)
 The down side to this is that a packages that requires dependencies from multiple packages like the multiple sensor framework package cannot compile
 ![large package failure](https://cloud.githubusercontent.com/assets/4311090/11759504/694fbb00-a040-11e5-80bb-65942e84acff.png)
