@@ -3,18 +3,18 @@ SLAM for Navigation of MAV's in Unknown Indoor Environments
 This project is an extension of *SLAM for Navigation of MAV's in Unknown Indoor Environments* by Gian Danuser and Michael Eugester. 
 
 ###Table of Contents
-[Objectives](#Objectives)  
-[Project Overview](#Project Overview) 
-[Setting up an internet connection  on the Pandaboard](#Setting up an internet connection  on the Pandaboard)  
-[Setting up ROS](#Setting up ROS)  
-[Building the pixhawk](#Building the pixhawk)  
-[Getting Mavros and Mavlink](#Getting Mavros and Mavlink)  
-[Setting up visual odometry and sensor fusion](#Setting up visual odometry and sensor fusion)
-[Offboard Control](#Offboard Control)
-[What's been Done and Issues](#What's been Done and Issues)
-[Further Improvements](#Further Improvements)  
-[Conclusions](#Conclusions)  
-[References](#References)
++ [Objectives](#Objectives)  
++ [Project Overview](#Project Overview) 
++ [Setting up an Internet Connection  on the Pandaboard](#Setting up an Internet Connection  on the Pandaboard)  
++ [Setting up ROS](#Setting up ROS)  
++ [Building the Pixhawk](#Building the Pixhawk)  
++ [Getting Mavros and Mavlink](#Getting Mavros and Mavlink)  
++ [Setting up visual odometry and sensor fusion](#Setting up visual odometry and sensor fusion)
++ [Offboard Control](#Offboard Control)
++ [What's been Done and Issues](#What's been Done and Issues)
++ [Further Improvements](#Further Improvements)  
++ [Conclusions](#Conclusions)  
++ [References](#References)
 
 <a name="Objectives"></a> 
 ###Objectives
@@ -30,8 +30,8 @@ The long term  goals of this project is to implement real-time SLAM, autonomous 
 The project builds off previous work that got SLAM working on a laptop, and radio controlled flight of the quadcopter. Fusing these two parts is the major objective of this project.
 The SLAM code used in this project was written from the ground up, including drivers for the ASUS Xtion PRO. The code works, however it is not optimised for the PandaBoard. The solution to this was to use ROS (Robot Operating System) as it has pre-existing packages for SLAM and algorithms can easily be written for autonomy, obstacle avoidance and object Detection.
 
-<a name="Setting up an internet connection  on the Pandaboard"></a> 
-###Setting up an internet connection  on the Pandaboard
+<a name="Setting up an Internet Connection  on the Pandaboard"></a> 
+###Setting up an Internet Connection  on the Pandaboard
 This is the first step as it precludes all the others. The first thing is to check if your access to the internet is being blocked. You check this with
 ```
 rfkill list
@@ -107,6 +107,10 @@ catkin_make #Even though the workspace is empty, it "compiles" which should tell
 echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc # auto sources workspace in new bash sessions
 source ~/.bashrc
 ```
+
+<a name="Building the Pixhawk"></a>
+###Building the Pixhawk
+[The steps for building the pixhawk can be found here!] (http://dev.px4.io/starting-installing-linux.html)
 
 <a name="Getting Mavros and Mavlink"></a> 
 ###Getting Mavros and Mavlink
