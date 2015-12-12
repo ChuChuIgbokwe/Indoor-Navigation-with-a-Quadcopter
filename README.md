@@ -28,4 +28,9 @@ This project is an extension of SLAM for Navigation of MAV's in Unknown Indoor E
 
 <a name="PandaBoard Issues"></a> 
 ###PandaBoard Issues
-The PandaBoard overheats while compiling your ROS workspace. The board has two cores
+The PandaBoard overheats while compiling your ROS workspace. The board has two cores which means compiling any workspace defaults to using the -j2 flag. To successfully compile any package you have to specify that it runs with one flag like this
+```
+catkin_make -j1
+```
+Or else this happens
+The down side to this is that a packages that requires dependencies from multiple packages like the multiple sensor framework package cannot compile
